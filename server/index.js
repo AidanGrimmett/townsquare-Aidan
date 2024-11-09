@@ -10,7 +10,7 @@ register.setDefaultLabels({
   app: "clocktower-online"
 });
 
-const PING_INTERVAL = 30000; // 30 seconds
+const PING_INTERVAL = 10000; // 10 seconds
 
 const options = {};
 
@@ -157,6 +157,7 @@ wss.on("connection", function connection(ws, req) {
     switch (messageType) {
       case '"ping"':
         // ping messages will only be sent host -> all or all -> host
+        console.log("Ping!");
         channels[ws.channel].forEach(function each(client) {
           if (
             client !== ws &&
@@ -251,8 +252,11 @@ wss.on("close", function close() {
 
 // prod mode with stats API
 if (process.env.NODE_ENV !== "development") {
-  console.log("server starting");
-  server.listen(8080);
+
+  console.log("Attempting to start server...");
+  server.listen(8081, () => console.log("Server is listening on port 8081"));
+  server.on("error", (err) => console.error("Server encountered an error:", err));
+
   server.on("request", (req, res) => {
     res.setHeader("Content-Type", register.contentType);
     register.metrics().then(out => res.end(out));
